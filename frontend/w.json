@@ -1,0 +1,543 @@
+[
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_nyJGj7i0p1ExkdEN",
+      "holder_id": "416148503",
+      "username": "416148503",
+      "holder_type": "individual",
+      "created_at": "2026-02-21T00:16:13.172Z",
+      "institution": {
+        "id": "cl_banco_bci",
+        "name": "BancoBCI",
+        "country": "cl"
+      },
+      "link_token": "link_nyJGj7i0p1ExkdEN_token_91Sdq29oiQfA4vgbg_DNc1gi",
+      "mode": "test",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "5A8Jw2OLT3YozWpZ",
+          "type": "checking_account",
+          "number": "422159212",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 67536094,
+            "current": 67536094,
+            "limit": 67536094
+          },
+          "holder_id": "416148503",
+          "holder_name": "GloriaNoriegaGirón",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-17T23:30:43.426Z",
+          "object": "account",
+          "next_refresh": "2026-02-21T04:16:12Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        },
+        {
+          "id": "acc_NDRKQeTYEgvXKvpn",
+          "type": "checking_account",
+          "number": "746329999",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 86608531,
+            "current": 86608531,
+            "limit": 86608531
+          },
+          "holder_id": "416148503",
+          "holder_name": "RosarioPalaciosYáñez",
+          "currency": "CLP",
+          "refreshed_at": "2026-01-29T14:40:55.420Z",
+          "object": "account",
+          "next_refresh": "2026-02-21T04:16:12Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        },
+        {
+          "id": "acc_ZnNM2LpTWpa2rwvP",
+          "type": "checking_account",
+          "number": "170086177",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 69306166,
+            "current": 69306166,
+            "limit": 69306166
+          },
+          "holder_id": "416148503",
+          "holder_name": "BernardoNavaOquendo",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-17T23:30:44.176Z",
+          "object": "account",
+          "next_refresh": "2026-02-21T04:16:12Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  },
+  {
+    "id": "evt_MRw5MdC6QYlMGBxg",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-21T00:16:20.094Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-21T00:16:14.653Z",
+      "public_error": null,
+      "new_movements": 60,
+      "refreshed_object": "account",
+      "refreshed_object_id": "5A8Jw2OLT3YozWpZ"
+    },
+    "object": "event"
+  },
+  {
+    "id": "evt_aokEWOC8jnD7MEnp",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-21T00:16:21.248Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-21T00:16:20.123Z",
+      "public_error": null,
+      "new_movements": 62,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_NDRKQeTYEgvXKvpn"
+    },
+    "object": "event"
+  },
+  {
+    "id": "evt_qAGBAYCoDQNVqBXd",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-21T00:16:22.228Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-21T00:16:21.279Z",
+      "public_error": null,
+      "new_movements": 39,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_ZnNM2LpTWpa2rwvP"
+    },
+    "object": "event"
+  },
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_DQoGNWi2MQxrkdxy",
+      "holder_id": "404276727",
+      "username": "404276727",
+      "holder_type": "individual",
+      "created_at": "2026-02-21T01:07:58.056Z",
+      "institution": {
+        "id": "cl_banco_scotiabank",
+        "name": "BancoScotiabank",
+        "country": "cl"
+      },
+      "link_token": "link_DQoGNWi2MQxrkdxy_token_wrQRTBZPcjbRCkxmkzsetyV-",
+      "mode": "test",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "acc_rPYop7TAynjW2M09",
+          "type": "checking_account",
+          "number": "813997777",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 54135756,
+            "current": 54135756,
+            "limit": 54135756
+          },
+          "holder_id": "404276727",
+          "holder_name": "FernandoNaranjoPartida",
+          "currency": "CLP",
+          "refreshed_at": null,
+          "object": "account",
+          "next_refresh": "2026-02-21T05:07:56Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        },
+        {
+          "id": "acc_jNOwodaTYv9KLgxp",
+          "type": "checking_account",
+          "number": "422159212",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 42724221,
+            "current": 42724221,
+            "limit": 42724221
+          },
+          "holder_id": "404276727",
+          "holder_name": "Sr.JacoboOcampoRuiz",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-05T23:58:48.162Z",
+          "object": "account",
+          "next_refresh": "2026-02-21T05:07:56Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  },
+  {
+    "id": "evt_mjXEJeC1dAvnkZd3",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-21T01:08:31.490Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-21T01:08:14.575Z",
+      "public_error": null,
+      "new_movements": 59,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_rPYop7TAynjW2M09"
+    },
+    "object": "event"
+  },
+  {
+    "id": "evt_PDLB3gCNk2K19BRv",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-21T01:08:39.155Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-21T01:08:33.726Z",
+      "public_error": null,
+      "new_movements": 62,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_jNOwodaTYv9KLgxp"
+    },
+    "object": "event"
+  },
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_JZxkRziB2DODkqo0",
+      "holder_id": "415792638",
+      "username": "415792638",
+      "holder_type": "individual",
+      "created_at": "2026-02-21T01:44:43.600Z",
+      "institution": {
+        "id": "cl_banco_estado",
+        "name": "BancoEstado",
+        "country": "cl"
+      },
+      "link_token": "link_JZxkRziB2DODkqo0_token_M5qEwFd4ueZP_EmQz5a5cP1d",
+      "mode": "test",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "acc_6yNPoPQTYrVKYOW8",
+          "type": "checking_account",
+          "number": "813990168",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 64414194,
+            "current": 64414194,
+            "limit": 64414194
+          },
+          "holder_id": "415792638",
+          "holder_name": "OctavioSerratoPerales",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-20T20:51:55.693Z",
+          "object": "account",
+          "next_refresh": "2026-02-21T05:44:42Z",
+          "refresh_status": "refreshing",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  },
+  {
+    "id": "evt_4oa5nRCd218pM53L",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-21T01:44:55.852Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-21T01:44:47.618Z",
+      "public_error": null,
+      "new_movements": 39,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_6yNPoPQTYrVKYOW8"
+    },
+    "object": "event"
+  },
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_NqxGxWiQOgnbXKm0",
+      "holder_id": "416148503",
+      "username": "416148503",
+      "holder_type": "individual",
+      "created_at": "2026-02-22T23:30:20.472Z",
+      "institution": {
+        "id": "cl_banco_scotiabank",
+        "name": "BancoScotiabank",
+        "country": "cl"
+      },
+      "link_token": "link_NqxGxWiQOgnbXKm0_token_9tBt1FDGy_-cRWPoxJ6sqNsa",
+      "mode": "test",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "acc_Pm4e2aBTLQJoydr7",
+          "type": "checking_account",
+          "number": "170086177",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 26953958,
+            "current": 26953958,
+            "limit": 26953958
+          },
+          "holder_id": "416148503",
+          "holder_name": "AlfredoAnguloTerrazas",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-17T23:30:21.347Z",
+          "object": "account",
+          "next_refresh": "2026-02-23T03:30:20Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        },
+        {
+          "id": "acc_NOwodaT5kgRdKLgx",
+          "type": "checking_account",
+          "number": "746329999",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 46082866,
+            "current": 46082866,
+            "limit": 46082866
+          },
+          "holder_id": "416148503",
+          "holder_name": "BenitoSantiagoEspinoza",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-05T23:22:10.502Z",
+          "object": "account",
+          "next_refresh": "2026-02-23T03:30:20Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  },
+  {
+    "id": "evt_3yO5R3CbD20Y7ZXL",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-22T23:30:24.283Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-22T23:30:20.695Z",
+      "public_error": null,
+      "new_movements": 66,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_Pm4e2aBTLQJoydr7"
+    },
+    "object": "event"
+  },
+  {
+    "id": "evt_O3mEkYC6r9qb75Ab",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-22T23:30:25.704Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-22T23:30:24.341Z",
+      "public_error": null,
+      "new_movements": 51,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_NOwodaT5kgRdKLgx"
+    },
+    "object": "event"
+  },
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_NqxGxWiQO245XKm0",
+      "holder_id": "416148503",
+      "username": "416148503",
+      "holder_type": "individual",
+      "created_at": "2026-02-23T00:06:36.662Z",
+      "institution": {
+        "id": "cl_banco_estado",
+        "name": "BancoEstado",
+        "country": "cl"
+      },
+      "link_token": "link_NqxGxWiQO245XKm0_token_LQyVUamyvyxScosND5dw9dRy",
+      "mode": "test",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "acc_JEwlMrTXWZMV29qz",
+          "type": "checking_account",
+          "number": "746329999",
+          "name": "CuentaCorriente",
+          "official_name": "CuentaCorriente",
+          "balance": {
+            "available": 50473795,
+            "current": 50473795,
+            "limit": 50473795
+          },
+          "holder_id": "416148503",
+          "holder_name": "Sta.LauraUribeMondragón",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-19T05:57:30.965Z",
+          "object": "account",
+          "next_refresh": "2026-02-23T04:06:36Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  },
+  {
+    "id": "evt_R2K5j7Cp6RQkzZrw",
+    "type": "account.refresh_intent.succeeded",
+    "mode": "test",
+    "created_at": "2026-02-23T00:06:39.306Z",
+    "data": {
+      "type": "historical",
+      "object": "refresh_intent",
+      "status": "succeeded",
+      "created_at": "2026-02-23T00:06:36.885Z",
+      "public_error": null,
+      "new_movements": 66,
+      "refreshed_object": "account",
+      "refreshed_object_id": "acc_JEwlMrTXWZMV29qz"
+    },
+    "object": "event"
+  },
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_9epGvPi53gpKLNyV",
+      "holder_id": "199353071",
+      "username": "199353071",
+      "holder_type": "individual",
+      "created_at": "2026-02-23T03:19:30.713Z",
+      "institution": {
+        "id": "cl_banco_santander",
+        "name": "BancoSantander",
+        "country": "cl"
+      },
+      "link_token": "link_9epGvPi53gpKLNyV_token_Hknz2d2SSpx61xSpwxN8ZRoA",
+      "mode": "live",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "acc_p4LK6qTDmn30om0X",
+          "type": "checking_account",
+          "number": "80286040",
+          "name": "CuentaCorriente",
+          "official_name": "CTACTE3000",
+          "balance": {
+            "available": 26699,
+            "current": 26699,
+            "limit": 26699
+          },
+          "holder_id": "199353071",
+          "holder_name": "GABRIELANDRESVILCHEZCABRERA",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-22T22:42:57.374Z",
+          "object": "account",
+          "next_refresh": "2026-02-23T07:19:30Z",
+          "refresh_status": "refreshing",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  },
+  {
+    "type": "link.created",
+    "data": {
+      "id": "link_W54GgpiB7DEEkN0a",
+      "holder_id": "199353071",
+      "username": "199353071",
+      "holder_type": "individual",
+      "created_at": "2026-02-23T03:26:50.678Z",
+      "institution": {
+        "id": "cl_banco_santander",
+        "name": "BancoSantander",
+        "country": "cl"
+      },
+      "link_token": "link_W54GgpiB7DEEkN0a_token_PkVNhYsN8zxStETzBswxL89Y",
+      "mode": "live",
+      "active": true,
+      "status": "active",
+      "refresh_status": "idle",
+      "last_time_refreshed": null,
+      "accounts": [
+        {
+          "id": "acc_p4LK6qTDmn30om0X",
+          "type": "checking_account",
+          "number": "80286040",
+          "name": "CuentaCorriente",
+          "official_name": "CTACTE3000",
+          "balance": {
+            "available": 26699,
+            "current": 26699,
+            "limit": 26699
+          },
+          "holder_id": "199353071",
+          "holder_name": "GABRIELANDRESVILCHEZCABRERA",
+          "currency": "CLP",
+          "refreshed_at": "2026-02-22T22:42:57.374Z",
+          "object": "account",
+          "next_refresh": "2026-02-23T07:26:50Z",
+          "refresh_status": "interrupted",
+          "removed_from_link": false
+        }
+      ],
+      "object": "link"
+    }
+  }
+]

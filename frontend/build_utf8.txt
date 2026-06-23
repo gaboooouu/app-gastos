@@ -1,0 +1,113 @@
+﻿
+> frontend@0.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 107 modules transformed.
+node.exe : [31mÔ£ù[39m 
+Build failed in 1.54s
+En línea: 1 Carácter: 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: ([31mÔ£ù  
+  [39m Build failed in 1.54   
+ s:String) [], RemoteExcep    
+tion
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+[31merror during build:
+[31msrc/pages/Dashboard.jsx 
+(5:9): "useFintoc" is not 
+exported by "node_modules/@fin
+toc/fintoc-js/build/module/ind
+ex.js", imported by "src/pages
+/Dashboard.jsx".[31m
+file: [36mC:/Users/gabri/OneD
+rive/Proyectos web 
+personales/App de gastos/front
+end/src/pages/Dashboard.jsx:5:
+9[31m
+[33m
+3: import apiClient from 
+'../api/axios';
+4: import CategoriesModal 
+from '../components/Categories
+Modal';
+5: import { useFintoc } from 
+'@fintoc/fintoc-js';
+            ^
+6: 
+7: export default function 
+Dashboard() {
+[31m
+    at getRollupError (file://
+/C:/Users/gabri/OneDrive/Proye
+ctos%20web%20personales/App%20
+de%20gastos/frontend/node_modu
+les/rollup/dist/es/shared/pars
+eAst.js:402:41)
+    at error (file:///C:/Users
+/gabri/OneDrive/Proyectos%20we
+b%20personales/App%20de%20gast
+os/frontend/node_modules/rollu
+p/dist/es/shared/parseAst.js:3
+98:42)
+    at Module.error (file:///C
+:/Users/gabri/OneDrive/Proyect
+os%20web%20personales/App%20de
+%20gastos/frontend/node_module
+s/rollup/dist/es/shared/node-e
+ntry.js:17040:16)
+    at Module.traceVariable (f
+ile:///C:/Users/gabri/OneDrive
+/Proyectos%20web%20personales/
+App%20de%20gastos/frontend/nod
+e_modules/rollup/dist/es/share
+d/node-entry.js:17452:29)
+    at 
+ModuleScope.findVariable (file
+:///C:/Users/gabri/OneDrive/Pr
+oyectos%20web%20personales/App
+%20de%20gastos/frontend/node_m
+odules/rollup/dist/es/shared/n
+ode-entry.js:15070:39)
+    at 
+FunctionScope.findVariable (fi
+le:///C:/Users/gabri/OneDrive/
+Proyectos%20web%20personales/A
+pp%20de%20gastos/frontend/node
+_modules/rollup/dist/es/shared
+/node-entry.js:5673:38)
+    at FunctionBodyScope.findV
+ariable (file:///C:/Users/gabr
+i/OneDrive/Proyectos%20web%20p
+ersonales/App%20de%20gastos/fr
+ontend/node_modules/rollup/dis
+t/es/shared/node-entry.js:5673
+:38)
+    at Identifier.bind (file:/
+//C:/Users/gabri/OneDrive/Proy
+ectos%20web%20personales/App%2
+0de%20gastos/frontend/node_mod
+ules/rollup/dist/es/shared/nod
+e-entry.js:5447:40)
+    at CallExpression.bind (fi
+le:///C:/Users/gabri/OneDrive/
+Proyectos%20web%20personales/A
+pp%20de%20gastos/frontend/node
+_modules/rollup/dist/es/shared
+/node-entry.js:2829:23)
+    at CallExpression.bind (fi
+le:///C:/Users/gabri/OneDrive/
+Proyectos%20web%20personales/A
+pp%20de%20gastos/frontend/node
+_modules/rollup/dist/es/shared
+/node-entry.js:12179:15)[39m
