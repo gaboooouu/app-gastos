@@ -1,5 +1,5 @@
 const { GoogleGenAI } = require('@google/genai');
-const { Account, Category, Transaction, sequelize } = require('../models');
+const { Account, Category, Transaction, AiChatMessage, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 // Inicializar el cliente de Google Gen AI
@@ -139,15 +139,29 @@ const modificarTransaccionTool = {
  */
 const chatIA = async (req, res) => {
   try {
-    let { history, message } = req.body;
-    if (typeof history === 'string') {
-      try {
-        history = JSON.parse(history);
-      } catch (e) {
-        history = [];
-      }
-    }
     const userId = req.user.id;
+    let { message } = req.body;
+
+    // A. Obtener historial de chat del usuario desde la base de datos (últimos 15 mensajes)
+    const dbHistory = await AiChatMessage.findAll({
+      where: { user_id: userId },
+      order: [['createdAt', 'DESC']],
+      limit: 15
+    });
+    const history = dbHistory.reverse();
+
+    // B. Registrar el mensaje actual del usuario en la base de datos
+    let userMsgText = message || '';
+    if (req.file) {
+      userMsgText = userMsgText ? `${userMsgText} (🎤 Audio)` : '🎤 Mensaje de voz';
+    }
+    if (userMsgText) {
+      await AiChatMessage.create({
+        user_id: userId,
+        sender: 'user',
+        text: userMsgText
+      });
+    }
 
     // 1. Obtener contexto de cuentas y categorías del usuario
     const accounts = await Account.findAll({ where: { user_id: userId } });
@@ -429,9 +443,16 @@ REGLAS DE OPERACIÓN:
           }).join('\n');
       }
 
+      const responseMsg = finalResponseText || 'He registrado tus movimientos exitosamente.';
+      await AiChatMessage.create({
+        user_id: userId,
+        sender: 'ai',
+        text: responseMsg
+      });
+
       return res.json({
         type: 'action_completed',
-        message: finalResponseText || 'He registrado tus movimientos exitosamente.',
+        message: responseMsg,
         expenses: registeredTransactions
       });
     }
@@ -598,17 +619,31 @@ REGLAS DE OPERACIÓN:
         finalResponseText = `¡Modificado! He editado con éxito la transacción "${modifiedTransaction.descripcion}". El nuevo monto es $${new Intl.NumberFormat('es-CL').format(modifiedTransaction.monto)} en tu cuenta ${modifiedTransaction.cuenta} (Categoría: ${modifiedTransaction.categoria}).`;
       }
 
+      const responseMsg = finalResponseText || 'Transacción modificada con éxito.';
+      await AiChatMessage.create({
+        user_id: userId,
+        sender: 'ai',
+        text: responseMsg
+      });
+
       return res.json({
         type: 'action_completed',
-        message: finalResponseText || 'Transacción modificada con éxito.',
+        message: responseMsg,
         expenses: [modifiedTransaction]
       });
     }
 
     // 8. Si la IA respondió con texto plano (preguntando o conversando)
+    const responseMsg = response.text || 'No logré entender completamente la instrucción. ¿Podrías repetirla o darme más detalles?';
+    await AiChatMessage.create({
+      user_id: userId,
+      sender: 'ai',
+      text: responseMsg
+    });
+
     return res.json({
       type: 'text',
-      message: response.text || 'No logré entender completamente la instrucción. ¿Podrías repetirla o darme más detalles?'
+      message: responseMsg
     });
 
   } catch (error) {
@@ -620,6 +655,46 @@ REGLAS DE OPERACIÓN:
   }
 };
 
+// GET /api/ia/chat/history
+const getHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const dbMessages = await AiChatMessage.findAll({
+      where: { user_id: userId },
+      order: [['createdAt', 'ASC']],
+      limit: 50
+    });
+
+    const messages = dbMessages.map(msg => ({
+      id: msg.id.toString(),
+      sender: msg.sender,
+      text: msg.text,
+      timestamp: msg.createdAt
+    }));
+
+    res.json({ success: true, messages });
+  } catch (error) {
+    console.error('Error al obtener el historial de chat:', error);
+    res.status(500).json({ error: 'Error al obtener el historial de chat' });
+  }
+};
+
+// DELETE /api/ia/chat/history
+const deleteHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await AiChatMessage.destroy({
+      where: { user_id: userId }
+    });
+    res.json({ success: true, message: 'Historial de chat borrado correctamente' });
+  } catch (error) {
+    console.error('Error al borrar el historial de chat:', error);
+    res.status(500).json({ error: 'Error al borrar el historial de chat' });
+  }
+};
+
 module.exports = {
-  chatIA
+  chatIA,
+  getHistory,
+  deleteHistory
 };

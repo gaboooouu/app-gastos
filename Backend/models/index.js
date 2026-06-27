@@ -7,6 +7,7 @@ const Setting = require('./Setting');
 const BudgetGroup = require('./BudgetGroup');
 const BudgetItem = require('./BudgetItem');
 const BudgetItemCategory = require('./BudgetItemCategory');
+const AiChatMessage = require('./AiChatMessage');
 
 // Relaciones con User (Multi-usuario)
 User.hasMany(Account, { foreignKey: 'user_id', as: 'accounts', onDelete: 'CASCADE' });
@@ -23,6 +24,9 @@ BudgetGroup.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 User.hasMany(Setting, { foreignKey: 'user_id', as: 'settings', onDelete: 'CASCADE' });
 Setting.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+User.hasMany(AiChatMessage, { foreignKey: 'user_id', as: 'aiChatMessages', onDelete: 'CASCADE' });
+AiChatMessage.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 // Definir Relaciones (Associations) entre modelos secundarios
 Account.hasMany(Transaction, { foreignKey: 'account_id', as: 'transactions', onDelete: 'CASCADE' });
@@ -47,6 +51,7 @@ module.exports = {
   Setting,
   BudgetGroup,
   BudgetItem,
-  BudgetItemCategory
+  BudgetItemCategory,
+  AiChatMessage
 };
 

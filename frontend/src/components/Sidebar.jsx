@@ -62,10 +62,17 @@ export default function Sidebar({ isOpen, onClose }) {
               <span className="material-symbols-outlined">payments</span>
               <span className="text-sm">Cuentas</span>
             </NavLink>
-            <NavLink to="/ia-chat" className={navLinkClasses} onClick={onClose}>
+            <button 
+              type="button"
+              onClick={() => {
+                window.dispatchEvent(new Event('open-ai-chat'));
+                onClose();
+              }} 
+              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-slate-500 hover:text-primary-dark font-semibold text-left w-full cursor-pointer"
+            >
               <span className="material-symbols-outlined">smart_toy</span>
               <span className="text-sm">Asistente IA</span>
-            </NavLink>
+            </button>
             <NavLink to="/reportes" className={navLinkClasses} onClick={onClose}>
               <span className="material-symbols-outlined">bar_chart</span>
               <span className="text-sm">Reportes</span>

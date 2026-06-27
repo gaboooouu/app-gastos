@@ -38,6 +38,14 @@ export default function Reports() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchData();
+    };
+    window.addEventListener('transaction-updated', handleUpdate);
+    return () => window.removeEventListener('transaction-updated', handleUpdate);
+  }, []);
+
   // FILTRADO MAESTRO DE TRANSACCIONES POR FECHA
   const filteredTransactions = useMemo(() => {
     if (dateFilter === 'all') return transactions;

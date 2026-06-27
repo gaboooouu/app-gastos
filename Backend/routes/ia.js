@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { chatIA } = require('../controllers/iaController');
+const { chatIA, getHistory, deleteHistory } = require('../controllers/iaController');
 
 // Configuración de multer para guardar el archivo temporalmente en memoria
 const upload = multer({
@@ -11,7 +11,9 @@ const upload = multer({
   }
 });
 
-// Ruta POST /api/ia/chat que acepta un mensaje opcional y un archivo de audio opcional
+// Rutas del asistente IA
 router.post('/chat', upload.single('audio'), chatIA);
+router.get('/chat/history', getHistory);
+router.delete('/chat/history', deleteHistory);
 
 module.exports = router;

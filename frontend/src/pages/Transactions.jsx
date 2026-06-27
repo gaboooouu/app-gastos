@@ -85,6 +85,14 @@ export default function Transactions() {
     fetchData();
   }, [categoryUpdateHash]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchData();
+    };
+    window.addEventListener('transaction-updated', handleUpdate);
+    return () => window.removeEventListener('transaction-updated', handleUpdate);
+  }, []);
+
   // Filtrado reactivo en el cliente
   const filteredTransactions = useMemo(() => {
     let result = transactions.filter(t => !t.parent_id).filter(t => {

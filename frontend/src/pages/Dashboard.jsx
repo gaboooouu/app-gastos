@@ -179,6 +179,14 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchData();
+    };
+    window.addEventListener('transaction-updated', handleUpdate);
+    return () => window.removeEventListener('transaction-updated', handleUpdate);
+  }, []);
+
   // Lógica de Presupuesto Semanal Libre
   const { spentThisWeek, percentage, progressColor } = useMemo(() => {
     const now = new Date();

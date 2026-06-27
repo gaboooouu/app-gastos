@@ -63,6 +63,14 @@ export default function Budget() {
     fetchData();
   }, [monthStr]);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchData();
+    };
+    window.addEventListener('transaction-updated', handleUpdate);
+    return () => window.removeEventListener('transaction-updated', handleUpdate);
+  }, [monthStr]);
+
   const openAddModal = (groupId = '') => {
     setEditingItem(null);
     setFormData({

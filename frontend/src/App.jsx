@@ -58,11 +58,12 @@ function AppContent() {
                     <Route path="/reportes" element={<Reports />} />
                     <Route path="/ajustes" element={<Settings />} />
                     <Route path="/info" element={<Info />} />
-                    <Route path="/ia-chat" element={<AiChat />} />
                   </Routes>
                 </main>
                 
                 <MobileNavbar />
+                
+                <AiChat />
               </div>
             </PinLock>
           </ProtectedRoute>

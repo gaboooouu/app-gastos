@@ -31,6 +31,14 @@ export default function Accounts() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchData();
+    };
+    window.addEventListener('transaction-updated', handleUpdate);
+    return () => window.removeEventListener('transaction-updated', handleUpdate);
+  }, []);
+
   const handleDeleteAccount = async (id) => {
     if (!confirm('⚠ ¡ATENCIÓN! ¿Estás seguro de eliminar esta cuenta? Esta acción es irreversible y ELIMINARÁ PERMANENTEMENTE todas las transacciones asociadas a ella. ¿Deseas continuar?')) return;
     try {
