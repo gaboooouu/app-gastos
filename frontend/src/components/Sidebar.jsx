@@ -62,6 +62,10 @@ export default function Sidebar({ isOpen, onClose }) {
               <span className="material-symbols-outlined">payments</span>
               <span className="text-sm">Cuentas</span>
             </NavLink>
+            <NavLink to="/ia-chat" className={navLinkClasses} onClick={onClose}>
+              <span className="material-symbols-outlined">smart_toy</span>
+              <span className="text-sm">Asistente IA</span>
+            </NavLink>
             <NavLink to="/reportes" className={navLinkClasses} onClick={onClose}>
               <span className="material-symbols-outlined">bar_chart</span>
               <span className="text-sm">Reportes</span>

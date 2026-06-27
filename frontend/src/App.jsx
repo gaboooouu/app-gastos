@@ -11,6 +11,7 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Budget from './pages/Budget';
 import Info from './pages/Info';
+import AiChat from './pages/AiChat';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MobileNavbar from './components/MobileNavbar';
@@ -57,6 +58,7 @@ function AppContent() {
                     <Route path="/reportes" element={<Reports />} />
                     <Route path="/ajustes" element={<Settings />} />
                     <Route path="/info" element={<Info />} />
+                    <Route path="/ia-chat" element={<AiChat />} />
                   </Routes>
                 </main>
                 

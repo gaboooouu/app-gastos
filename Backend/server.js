@@ -15,6 +15,7 @@ const webhooksRoutes = require('./routes/webhooks');
 const categoriesRoutes = require('./routes/categories');
 const settingsRoutes = require('./routes/settings');
 const budgetRoutes = require('./routes/budgetRoutes');
+const iaRoutes = require('./routes/ia');
 const { authenticateToken } = require('./middlewares/auth');
 
 const app = express();
@@ -69,6 +70,7 @@ app.use('/api/categories', authenticateToken, categoriesRoutes);
 app.use('/api/webhooks', webhooksRoutes); // inside we protect /notifications but leave /fintoc public
 app.use('/api/settings', authenticateToken, settingsRoutes);
 app.use('/api/budget', authenticateToken, budgetRoutes);
+app.use('/api/ia', authenticateToken, iaRoutes);
 
 // Health check para monitoreo de hosting
 app.get('/health', (req, res) => res.status(200).send('OK'));
