@@ -92,6 +92,12 @@ export default function Sidebar({ isOpen, onClose }) {
               <span className="material-symbols-outlined">settings</span>
               <span className="text-sm">Ajustes</span>
             </NavLink>
+            {user?.role === 'admin' && (
+              <NavLink to="/admin" className={navLinkClasses} onClick={onClose}>
+                <span className="material-symbols-outlined">admin_panel_settings</span>
+                <span className="text-sm">Administración</span>
+              </NavLink>
+            )}
             <NavLink to="/info" className={navLinkClasses} onClick={onClose}>
               <span className="material-symbols-outlined">help</span>
               <span className="text-sm">Información</span>

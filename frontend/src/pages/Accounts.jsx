@@ -12,7 +12,6 @@ export default function Accounts() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [accountToEdit, setAccountToEdit] = useState(null);
-  const [pendingAccountName, setPendingAccountName] = useState('');
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -49,43 +48,6 @@ export default function Accounts() {
       console.error(error);
       toast.error('Error al eliminar la cuenta');
     }
-  };
-
-  const handleOpenFintoc = (accountName) => {
-    if (!window.Fintoc) {
-      toast.error('Fintoc no está disponible todavía.');
-      return;
-    }
-    setPendingAccountName(accountName);
-
-    const widget = window.Fintoc.create({
-      publicKey: import.meta.env.VITE_FINTOC_PUBLIC_KEY || 'pk_test_J6gJwbfDh-aKRRzEvoo16Ehoef_zHhv--AREgVtukr8',
-      holderType: 'individual',
-      product: 'movements',
-      webhookUrl: import.meta.env.VITE_FINTOC_WEBHOOK_URL || 'https://webhook.site/707ee6e8-276d-4b8a-9abc-efbfb1154481',
-      onSuccess: async (link) => {
-        try {
-          await apiClient.post('/accounts', {
-            name: accountName,
-            type: 'fintoc',
-            fintoc_link_id: link.id,
-            balance: 0,
-          });
-          toast.success(`¡Cuenta bancaria Fintoc vinculada con éxito!`);
-          fetchData();
-        } catch (error) {
-          console.error(error);
-          toast.error('Error al guardar la cuenta vinculada.');
-        } finally {
-          setPendingAccountName('');
-        }
-      },
-      onExit: () => {
-        toast('Proceso cancelado', { icon: 'ℹ️' });
-        setPendingAccountName('');
-      }
-    });
-    widget.open();
   };
 
   const totalBalance = accounts.reduce((acc, curr) => acc + (curr.balance || 0), 0);
@@ -137,16 +99,10 @@ export default function Accounts() {
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
                   <span className="material-symbols-outlined text-primary-dark">
-                    {acc.type === 'fintoc' ? 'account_balance' : 'account_balance_wallet'}
+                    account_balance_wallet
                   </span>
                 </div>
                 <div>
-                  {acc.type === 'fintoc' && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest rounded-md block w-max mb-1">Automática</span>
-                  )}
-                  {acc.type === 'manual' && (
-                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-md block w-max mb-1">Manual</span>
-                  )}
                   <p className="font-bold text-slate-700">{acc.name}</p>
                 </div>
               </div>
@@ -163,19 +119,17 @@ export default function Accounts() {
                 {/* Dropdown Box */}
                 {activeDropdown === acc.id && (
                   <div className="absolute right-0 top-full mt-2 w-36 bg-white rounded-xl shadow-lg shadow-slate-200/50 border border-slate-100 py-2 z-20 flex flex-col">
-                    {acc.type === 'manual' && (
-                      <button 
-                        onClick={() => {
-                          setAccountToEdit(acc);
-                          setIsEditModalOpen(true);
-                          setActiveDropdown(null);
-                        }}
-                        className="text-left px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-dark flex items-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">edit</span>
-                        Editar
-                      </button>
-                    )}
+                     <button 
+                       onClick={() => {
+                         setAccountToEdit(acc);
+                         setIsEditModalOpen(true);
+                         setActiveDropdown(null);
+                       }}
+                       className="text-left px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-dark flex items-center gap-2"
+                     >
+                       <span className="material-symbols-outlined text-[18px]">edit</span>
+                       Editar
+                     </button>
                     <button 
                       onClick={() => {
                         handleDeleteAccount(acc.id);
@@ -217,7 +171,6 @@ export default function Accounts() {
       <AccountModal 
         isOpen={isAccountModalOpen} 
         onClose={() => setIsAccountModalOpen(false)} 
-        onFintocLink={handleOpenFintoc}
         onSuccess={fetchData}
       />
       

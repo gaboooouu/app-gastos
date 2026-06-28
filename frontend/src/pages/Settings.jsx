@@ -99,7 +99,7 @@ export default function Settings() {
 
   const handleResetData = async () => {
     if (!confirm('¡ADVERTENCIA CRÍTICA! Esto eliminará permanentemente TODAS tus Cuentas, Categorías y Movimientos. ¿Confirmas que quieres empezar desde cero?')) return;
-    
+
     if (!confirm('¿Estás 100% seguro? Esta acción no se puede deshacer.')) return;
 
     setLoadingReset(true);
@@ -152,7 +152,7 @@ export default function Settings() {
           <section className="neu-card p-6 md:p-8 rounded-3xl border-t-4 border-primary">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                 <span className="material-symbols-outlined text-primary-dark font-bold text-2xl">mail</span>
+                <span className="material-symbols-outlined text-primary-dark font-bold text-2xl">mail</span>
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-800">Presupuesto y Notificaciones</h2>
@@ -163,7 +163,7 @@ export default function Settings() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="col-span-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1 mb-1 block">Límite Semanal Libre (CLP)</label>
-                <input 
+                <input
                   type="number"
                   value={weeklyLimit}
                   onChange={(e) => setWeeklyLimit(e.target.value)}
@@ -173,7 +173,7 @@ export default function Settings() {
               </div>
               <div className="col-span-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1 mb-1 block">Emails para Alertas</label>
-                <input 
+                <input
                   type="text"
                   value={notiEmail}
                   onChange={(e) => setNotiEmail(e.target.value)}
@@ -181,17 +181,17 @@ export default function Settings() {
                   placeholder="ejemplo1@mail.com, ejemplo2@mail.com"
                 />
               </div>
-              
+
               <div className="col-span-1 md:col-span-2 flex items-center gap-4 p-4 bg-white/50 rounded-2xl border border-white">
                 <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out shrink-0">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     id="email-toggle"
                     checked={emailEnabled}
                     onChange={(e) => setEmailEnabled(e.target.checked)}
                     className="opacity-0 w-0 h-0"
                   />
-                  <label 
+                  <label
                     htmlFor="email-toggle"
                     className={`absolute cursor-pointer inset-0 rounded-full transition-colors duration-200 ${emailEnabled ? 'bg-primary' : 'bg-slate-300'}`}
                   >
@@ -205,12 +205,12 @@ export default function Settings() {
               </div>
             </div>
           </section>
-     
+
           {/* SECCIÓN: SEGURIDAD Y PIN */}
           <section className="neu-card p-6 md:p-8 rounded-3xl border-t-4 border-cyan-400">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center shrink-0">
-                 <span className="material-symbols-outlined text-cyan-600 font-bold text-2xl">lock</span>
+                <span className="material-symbols-outlined text-cyan-600 font-bold text-2xl">lock</span>
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-800">Seguridad y PIN de Acceso</h2>
@@ -221,14 +221,14 @@ export default function Settings() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="col-span-1 md:col-span-2 flex items-center gap-4 p-4 bg-white/50 rounded-2xl border border-white">
                 <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out shrink-0">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     id="pin-toggle"
                     checked={pinEnabled}
                     onChange={(e) => setPinEnabled(e.target.checked)}
                     className="opacity-0 w-0 h-0"
                   />
-                  <label 
+                  <label
                     htmlFor="pin-toggle"
                     className={`absolute cursor-pointer inset-0 rounded-full transition-colors duration-200 ${pinEnabled ? 'bg-primary' : 'bg-slate-300'}`}
                   >
@@ -244,7 +244,7 @@ export default function Settings() {
               {pinEnabled && (
                 <div className="col-span-1 md:col-span-2 animate-fade-in">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1 mb-1 block">Código PIN de 4 dígitos</label>
-                  <input 
+                  <input
                     type="password"
                     pattern="[0-9]*"
                     maxLength={4}
@@ -262,8 +262,8 @@ export default function Settings() {
             </div>
           </section>
 
-          <div className="flex justify-end">
-            <button 
+          <div className="flex justify-end mb-6">
+            <button
               type="submit"
               disabled={savingSettings}
               className="neu-button px-10 py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 text-primary-dark hover:bg-primary/10 transition-colors shadow-lg"
@@ -282,7 +282,7 @@ export default function Settings() {
       <section className="neu-card p-6 md:p-8 rounded-3xl mb-10 border-t-4 border-orange-400">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-             <span className="material-symbols-outlined text-orange-600 font-bold text-2xl">date_range</span>
+            <span className="material-symbols-outlined text-orange-600 font-bold text-2xl">date_range</span>
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800">Limpieza por Rango de Fechas</h2>
@@ -293,7 +293,7 @@ export default function Settings() {
         <form onSubmit={handleDeleteByDate} className="flex flex-col md:flex-row gap-4 items-end">
           <div className="w-full">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1 mb-1 block">Desde (Día Inicial)</label>
-            <input 
+            <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -303,7 +303,7 @@ export default function Settings() {
           </div>
           <div className="w-full">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1 mb-1 block">Hasta (Día Final)</label>
-            <input 
+            <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
@@ -311,7 +311,7 @@ export default function Settings() {
               required
             />
           </div>
-          <button 
+          <button
             type="submit"
             disabled={loadingDate}
             className="neu-button p-4 rounded-xl font-bold w-full md:w-auto shrink-0 flex items-center justify-center gap-2 text-orange-600 hover:text-orange-800 bg-orange-50/50 transition-colors"
@@ -338,7 +338,7 @@ export default function Settings() {
               <p className="text-sm text-slate-500 hidden sm:block">Acciones destructivas que no se pueden deshacer.</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setShowDangerZone(!showDangerZone)}
             className="neu-button px-4 py-2 rounded-lg text-sm font-bold text-slate-500 shrink-0"
           >
@@ -353,7 +353,7 @@ export default function Settings() {
                 <h3 className="font-bold text-slate-800 text-lg">Resetear Base de Datos Completa</h3>
                 <p className="text-sm text-slate-600 mt-1 max-w-md">Esto vaciará toda la base de datos: eliminará todas tus cuentas vinculadas, categorías personalizadas y tu historial completo de movimientos. Quedará en cero absoluto.</p>
               </div>
-              <button 
+              <button
                 onClick={handleResetData}
                 disabled={loadingReset}
                 className="bg-red-500 hover:bg-red-600 text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-red-500/30 transition-all flex items-center justify-center gap-2 shrink-0 w-full md:w-auto"
@@ -372,7 +372,7 @@ export default function Settings() {
                 <h3 className="font-bold text-slate-800 text-lg">Eliminar Mi Cuenta Permanentemente</h3>
                 <p className="text-sm text-slate-600 mt-1 max-w-md">Esto eliminará tu cuenta de usuario, tus datos, transacciones y configuraciones de forma irreversible. Perderás todo el acceso inmediatamente.</p>
               </div>
-              <button 
+              <button
                 onClick={handleDeleteAccount}
                 disabled={loadingDeleteAccount}
                 className="bg-red-600 hover:bg-red-700 text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2 shrink-0 w-full md:w-auto"

@@ -66,7 +66,7 @@ const register = async (req, res) => {
     await BudgetGroup.bulkCreate(defaultGroups);
 
     // Generar Token JWT
-    const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '365d' });
+    const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '365d' });
 
     res.status(201).json({
       message: 'Usuario registrado con éxito',
@@ -74,7 +74,8 @@ const register = async (req, res) => {
       user: {
         id: newUser.id,
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        role: newUser.role
       }
     });
   } catch (error) {
@@ -105,14 +106,15 @@ const login = async (req, res) => {
     }
 
     // Generar Token JWT
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '365d' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '365d' });
 
     res.json({
       token,
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
       }
     });
   } catch (error) {
@@ -125,7 +127,7 @@ const login = async (req, res) => {
 const me = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'name', 'email']
+      attributes: ['id', 'name', 'email', 'role']
     });
 
     if (!user) {

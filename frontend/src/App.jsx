@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
@@ -12,6 +13,7 @@ import Settings from './pages/Settings';
 import Budget from './pages/Budget';
 import Info from './pages/Info';
 import AiChat from './pages/AiChat';
+import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MobileNavbar from './components/MobileNavbar';
@@ -58,6 +60,11 @@ function AppContent() {
                     <Route path="/reportes" element={<Reports />} />
                     <Route path="/ajustes" element={<Settings />} />
                     <Route path="/info" element={<Info />} />
+                    <Route path="/admin" element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
+                    } />
                   </Routes>
                 </main>
                 

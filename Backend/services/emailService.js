@@ -94,7 +94,7 @@ const sendSyncNotification = async (count, toEmail) => {
 
       <div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
         <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-top: 0;">Hola,</p>
-        <p style="color: #475569; font-size: 16px; line-height: 1.6;">Hemos detectado <b>${count}</b> nuevos movimientos en tus cuentas vinculadas de Fintoc.</p>
+        <p style="color: #475569; font-size: 16px; line-height: 1.6;">Hemos detectado <b>${count}</b> nuevos movimientos en tus cuentas vinculadas.</p>
         
         <div style="margin: 30px 0; padding: 20px; background-color: #eff6ff; border-radius: 10px; text-align: center; border: 1px dashed #3b82f6;">
           <span style="color: #1e40af; font-size: 15px; font-weight: bold;">Tus transacciones ya están actualizadas.</span>

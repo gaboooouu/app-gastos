@@ -22,6 +22,11 @@ const User = sequelize.define('User', {
   password_hash: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'user'
   }
 }, {
   timestamps: true,

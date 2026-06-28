@@ -64,46 +64,7 @@ export default function Dashboard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [accountToEdit, setAccountToEdit] = useState(null);
 
-  // Variable transitoria para almacenar el nombre de la cuenta hasta que Fintoc termine
-  const [pendingAccountName, setPendingAccountName] = useState('');
 
-  const handleOpenFintoc = (accountName) => {
-    if (!window.Fintoc) {
-      toast.error('Fintoc no está disponible todavía.');
-      return;
-    }
-    setPendingAccountName(accountName);
-
-    const widget = window.Fintoc.create({
-      publicKey: import.meta.env.VITE_FINTOC_PUBLIC_KEY || 'pk_test_J6gJwbfDh-aKRRzEvoo16Ehoef_zHhv--AREgVtukr8',
-      holderType: 'individual',
-      product: 'movements',
-      webhookUrl: import.meta.env.VITE_FINTOC_WEBHOOK_URL || 'https://webhook.site/707ee6e8-276d-4b8a-9abc-efbfb1154481',
-      onSuccess: async (link) => {
-        try {
-          await apiClient.post('/accounts', {
-            // Pasamos la variable pendiente del modal hacia nuestra API
-            name: accountName,
-            type: 'fintoc',
-            fintoc_link_id: link.id,
-            balance: 0,
-          });
-          toast.success(`¡Cuenta bancaria Fintoc vinculada con éxito!`);
-          fetchData();
-        } catch (error) {
-          console.error(error);
-          toast.error('Error al guardar la cuenta vinculada.');
-        } finally {
-          setPendingAccountName('');
-        }
-      },
-      onExit: () => {
-        toast('Proceso cancelado', { icon: 'ℹ️' });
-        setPendingAccountName('');
-      }
-    });
-    widget.open();
-  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -524,7 +485,6 @@ export default function Dashboard() {
       <AccountModal
         isOpen={isAccountModalOpen}
         onClose={() => setIsAccountModalOpen(false)}
-        onFintocLink={handleOpenFintoc}
         onSuccess={fetchData}
       />
 

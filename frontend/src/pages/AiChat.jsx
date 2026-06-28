@@ -62,6 +62,14 @@ export default function AiChat() {
     scrollToBottom();
   }, [messages, isProcessing]);
 
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 150);
+    }
+  }, [isOpen]);
+
   // Limpiar historial de chat
   const handleClearChat = async () => {
     if (!confirm('¿Estás seguro de borrar todo el historial de conversación?')) return;
