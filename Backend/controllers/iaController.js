@@ -133,6 +133,34 @@ const modificarTransaccionTool = {
   }
 };
 
+// Tool 3: crearCategoria
+const crearCategoriaTool = {
+  name: 'crearCategoria',
+  description: 'Crea una nueva categoría de gastos o ingresos personalizada para el usuario.',
+  parameters: {
+    type: 'OBJECT',
+    properties: {
+      nombre: {
+        type: 'STRING',
+        description: 'Nombre de la nueva categoría a crear (ej: "Transporte", "Suscripciones").'
+      },
+      tipo_gasto: {
+        type: 'STRING',
+        description: 'Opcional. Tipo de gasto: "fijo" (Necesario) o "libre" (Ocio). Si no está claro o el usuario no lo especificó en su mensaje anterior, NO lo definas aquí para poder preguntarle.'
+      },
+      icono_sugerido: {
+        type: 'STRING',
+        description: 'Ícono más ad-hoc seleccionado de la lista disponible: "FaHamburger", "FaCar", "FaGamepad", "FaHome", "FaDog", "FaGift", "FaHeartbeat", "FaCoffee", "FaShoppingBag", "FaPlane", "FaUtensils", "FaTshirt", "FaGasPump", "FaGraduationCap", "FaDumbbell", "FaBaby", "FaBus", "FaTools", "FaPhone", "FaWifi".'
+      },
+      color_sugerido: {
+        type: 'STRING',
+        description: 'Color seleccionado de la lista disponible: "bg-red-200", "bg-orange-200", "bg-yellow-200", "bg-green-200", "bg-teal-200", "bg-blue-200", "bg-indigo-200", "bg-purple-200", "bg-pink-200", "bg-slate-200".'
+      }
+    },
+    required: ['nombre', 'icono_sugerido', 'color_sugerido']
+  }
+};
+
 /**
  * Procesa la interacción del chat con la IA (Gemini).
  * Soporta texto y archivo de audio en req.file (mimetype: audio/webm, audio/mp3, etc.).
@@ -188,7 +216,7 @@ REGLAS DE OPERACIÓN:
 1. Registro de Gastos e Ingresos:
    - Identifica si el usuario reporta un "gasto" (ej: pagué, compré, gasté) o un "ingreso" (ej: gané, recibí, sueldo, me depositaron, me pagaron).
    - Llama a la herramienta 'registrarTransacciones' asignando el parámetro 'tipo' como "gasto" o "ingreso" respectivamente.
-   - Clasificación Semántica Inteligente: Mapea cualquier comercio o detalle que mencione el usuario (ej: "Starbucks", "Sueldo", "Transferencia recibida") de forma semántica a una de las categorías REALES listadas arriba. Si la transacción no encaja de manera lógica, directa u obvia en ninguna de las categorías reales del usuario (por ejemplo, un viaje de Uber cuando el usuario no tiene ninguna categoría parecida a "Transporte", "Automóvil" o "Viajes"), NO asumas una categoría inapropiada como "Comidas" ni asocies una incorrecta al azar. Considera esto como una falta de categoría adecuada.
+   - Clasificación Semántica Inteligente: Mapea cualquier comercio o detalle que mencione el usuario (ej: "Starbucks", "Sueldo", "Transferencia recibida") de forma semántica a una de las categorías REALES listadas arriba. Si la transacción no encaja de manera lógica, directa u obvia en ninguna de las categorías reales del usuario (por ejemplo, un viaje de Uber cuando el usuario no tiene ninguna categoría parecida a "Transporte", "Automóvil" o "Viajes"), NO asumas una categoría inapropiada como "Comidas" ni asocies una incorrecta al azar. En su lugar, considera esto como una duda legítima de categoría y sigue la Regla 3.
 
 2. Modificación/Edición de Transacciones (¡NUEVO!):
    - Si el usuario te pide explícitamente editar, corregir, modificar o cambiar una transacción (ej: "cámbiame la categoría del último gasto a Comidas", "edita la transacción de Starbucks del lunes pasado, en realidad costó 5000 pesos no 3000", "corrige el monto de ayer a 12000"), debes llamar a la herramienta 'modificarTransaccion'.
@@ -198,8 +226,12 @@ REGLAS DE OPERACIÓN:
 
 3. Regla de Aclaración / Confirmación (¡CRÍTICA!):
    - Para registrar o modificar necesitas: monto, cuenta bancaria (que coincida con una real) y categoría.
-   - Si te falta la cuenta bancaria (y el usuario tiene más de una cuenta activa), o si no existe una categoría obvia y adecuada en la lista real de categorías para este movimiento, NO ejecutes la herramienta.
-   - En su lugar, responde en texto plano de manera amigable haciendo la pregunta correspondiente. Explica que detectaste la transacción pero que no encuentras una categoría apropiada en su lista actual. Sugiérele guardarlo en una existente (como "Otros" si existe) o crear una nueva categoría. Ejemplo: "Detecté un gasto de $5.000 en un viaje de Uber. Sin embargo, no tienes una categoría de 'Transporte' en tu cuenta. ¿Te gustaría registrarlo en otra categoría existente, o prefieres crear una nueva categoría para tus viajes primero?"
+   - Si te falta la cuenta bancaria (y el usuario tiene más de una cuenta activa), o si no existe una categoría obvia y adecuada en la lista real de categorías para este movimiento:
+     - NO ejecutes la herramienta de registro de transacciones directamente usando una categoría incorrecta.
+     - Responde en texto plano de manera amigable explicando que detectaste el movimiento pero que no encuentras una categoría apropiada.
+     - Proponle explícitamente crear una nueva categoría que consideres afín con el gasto (ej: proponer crear "Transporte" para Uber) o guardarlo en una existente (Ofrécele las existentes).
+     - Pregúntale si es un gasto Fijo o Libre si decide crearla.
+     - Ejemplo: "Detecté un gasto de $5.000 en un viaje de Uber. Sin embargo, no tienes una categoría de 'Transporte' en tu cuenta. ¿Te gustaría registrarlo en otra categoría existente, o prefieres que cree una nueva categoría llamada 'Transporte' para tus viajes? (Si decidimos crearla, ¿correspondería a un gasto Fijo o Libre?)"
 
 4. Regla de Cuenta Única:
    ${accounts.length === 1 ? `* El usuario tiene SOLO una cuenta bancaria llamada "${accounts[0].name}". Por lo tanto, NO le preguntes qué cuenta usar; asume automáticamente "${accounts[0].name}" para todas las transacciones de registro y modificación y colócala en los parámetros correspondientes.` : `* El usuario tiene múltiples cuentas. Si el usuario no especifica explícitamente cuál cuenta usar, debes preguntarle por texto plano antes de ejecutar la herramienta.`}
@@ -214,11 +246,18 @@ REGLAS DE OPERACIÓN:
    - Si el usuario indica que desea registrar un gasto y dividirlo en múltiples conceptos (ej: "Gasté 650000 pesos en Assetplan y de esos 650000, 150000 fueron del estacionamiento y el resto fue para el arriendo"), debes:
      1. Pasar el total de la compra (ej: 650000) como el 'monto' principal de la transacción.
      2. Identificar la categoría principal del gasto (ej: "Arriendo" o "Gastos Comunes") y asignarla a 'categoria_sugerida' de la transacción principal.
-     3. Mapear cada parte en el arreglo 'divisiones' enviando únicamente 'monto' y 'descripcion' (no se requiere categoría para los splits).
+     3. Mapear cada parte en el arreglo 'divisiones' enviando únicamente 'monto' and 'descripcion' (no se requiere categoría para los splits).
      4. Calcular los montos individuales. Si dice "y el resto", resta la parte conocida al monto total (ej: 650000 - 150000 = 500000).
      5. Asegurarte de que la suma de los montos de 'divisiones' dé exactamente el monto total principal.
      6. Todas las partes divididas heredarán de forma automática la misma categoría de la transacción principal.
      7. En tu respuesta narrativa final al usuario, debes detallar amigablemente el desglose completo de la división indicando los montos y detalles correspondientes de cada parte.
+
+8. Creación de Categorías (¡NUEVO!):
+   - Si el usuario te pide explícitamente crear una categoría (ej: "crea la categoría Transporte", "crea una nueva categoría para regalos llamada Regalos") o si respondes a la pregunta aclaratoria proponiendo una categoría y el usuario te responde aceptando (ej: "Sí, crea la categoría Transporte y es Fijo"), debes llamar a la herramienta 'crearCategoria'.
+   - Elige el ícono ('icono_sugerido') más ad-hoc seleccionado de la lista de íconos disponibles descrita en la herramienta.
+   - Elige un color ('color_sugerido') apropiado de la lista descrita en la herramienta.
+   - Tipo de Gasto (Fijo vs Libre): Si el usuario no especificó si la categoría es un gasto "Fijo (Necesario)" o "Libre (Ocio)", déjalo como "libre" o "fijo" temporalmente y, en tu respuesta final de confirmación, DEBES preguntarle explícitamente al usuario si esta categoría corresponde a un gasto "Fijo (Necesario)" o "Libre (Ocio)". Si el usuario ya lo especificó en su mensaje, entonces pásalo en el parámetro 'tipo_gasto' y confirma que quedó configurada como tal.
+   - Si te piden "Edita el ultimo movimiento, crea la categoría 'Transporte' y asignasela", debes llamar a 'crearCategoria' para crearla y a 'modificarTransaccion' para asignársela a la transacción. Ambas herramientas se pueden llamar en el mismo turno.
 `;
 
     // 3. Estructurar el historial de contenidos para Gemini
@@ -237,7 +276,7 @@ REGLAS DE OPERACIÓN:
 
     // 4. Agregar el mensaje actual del usuario (puede ser texto y/o audio)
     const currentParts = [];
-    
+
     // Si viene un archivo de audio procesado por multer
     if (req.file) {
       currentParts.push({
@@ -270,113 +309,259 @@ REGLAS DE OPERACIÓN:
       contents: contents,
       config: {
         systemInstruction,
-        tools: [{ functionDeclarations: [registrarTransaccionesTool, modificarTransaccionTool] }]
+        tools: [{ functionDeclarations: [registrarTransaccionesTool, modificarTransaccionTool, crearCategoriaTool] }]
       }
     });
 
-    const functionCall = response.functionCalls?.[0];
+    const functionCalls = response.functionCalls || [];
 
-    // 6. Verificar si la IA decidió llamar a registrarTransacciones
-    if (functionCall && functionCall.name === 'registrarTransacciones') {
-      const { transacciones } = functionCall.args;
+    if (functionCalls.length > 0) {
       const t = await sequelize.transaction();
       let isCommitted = false;
-      const registeredTransactions = [];
+      const results = [];
 
       try {
-        for (const g of transacciones) {
-          // Buscar cuenta coincidente (case-insensitive)
-          let matchedAccount = accounts.find(
-            acc => acc.name.toLowerCase().trim() === (g.cuenta_identificada || '').toLowerCase().trim()
-          );
+        // Cargar categorías y cuentas en la transacción
+        let activeCategories = await Category.findAll({ where: { user_id: userId }, transaction: t });
+        let activeAccounts = await Account.findAll({ where: { user_id: userId }, transaction: t });
 
-          // Si no hace match y el usuario solo tiene una cuenta, la asignamos por defecto
-          if (!matchedAccount && accounts.length === 1) {
-            matchedAccount = accounts[0];
-          }
+        for (const call of functionCalls) {
+          if (call.name === 'crearCategoria') {
+            const { nombre, tipo_gasto, icono_sugerido, color_sugerido } = call.args;
 
-          if (!matchedAccount) {
-            throw new Error(`No se encontró la cuenta '${g.cuenta_identificada}' del usuario.`);
-          }
+            // Evitar duplicados
+            let existing = activeCategories.find(
+              c => c.name.toLowerCase().trim() === nombre.toLowerCase().trim()
+            );
 
-          // Buscar categoría coincidente (case-insensitive)
-          const matchedCategory = categories.find(
-            cat => cat.name.toLowerCase().trim() === g.categoria_sugerida.toLowerCase().trim()
-          );
-
-          // Mapear fecha (si Gemini calculó una fecha relativa, la usamos a mediodía local)
-          const txDate = g.fecha ? new Date(g.fecha + 'T12:00:00') : new Date();
-
-          // Validar tipo: 'gasto' o 'ingreso'. Por defecto 'gasto'.
-          const txType = g.tipo === 'ingreso' ? 'ingreso' : 'gasto';
-
-          const hasSplits = g.divisiones && g.divisiones.length > 0;
-
-          if (hasSplits) {
-            const sumSplits = g.divisiones.reduce((sum, s) => sum + Math.abs(parseFloat(s.monto)), 0);
-            if (Math.abs(sumSplits - Math.abs(parseFloat(g.monto))) > 0.01) {
-              throw new Error(`La suma de las partes divididas ($${sumSplits}) no coincide con el monto total de la transacción ($${g.monto}).`);
+            if (!existing) {
+              existing = await Category.create({
+                name: nombre,
+                icon: icono_sugerido || 'FaCoffee',
+                color: color_sugerido || 'bg-slate-200',
+                budget_type: tipo_gasto || 'libre',
+                user_id: userId
+              }, { transaction: t });
+              activeCategories.push(existing);
             }
+
+            results.push({
+              name: 'crearCategoria',
+              call,
+              response: { 
+                success: true, 
+                message: `Categoría "${existing.name}" creada exitosamente.`, 
+                category: {
+                  id: existing.id,
+                  name: existing.name,
+                  icon: existing.icon,
+                  color: existing.color,
+                  budget_type: existing.budget_type
+                }
+              }
+            });
           }
+          else if (call.name === 'registrarTransacciones') {
+            const { transacciones } = call.args;
+            const registeredTransactions = [];
 
-          // Crear la transacción principal (padre)
-          const newTx = await Transaction.create({
-            account_id: matchedAccount.id,
-            amount: Math.abs(parseFloat(g.monto)),
-            date: txDate,
-            original_description: g.descripcion,
-            category_id: matchedCategory ? matchedCategory.id : null,
-            type: txType,
-            source: 'manual',
-            is_split: hasSplits,
-            user_id: userId
-          }, { transaction: t });
+            for (const g of transacciones) {
+              let matchedAccount = activeAccounts.find(
+                acc => acc.name.toLowerCase().trim() === (g.cuenta_identificada || '').toLowerCase().trim()
+              );
+              if (!matchedAccount && activeAccounts.length === 1) {
+                matchedAccount = activeAccounts[0];
+              }
+              if (!matchedAccount) {
+                throw new Error(`No se encontró la cuenta '${g.cuenta_identificada}' del usuario.`);
+              }
 
-          // Actualizar saldo de la cuenta
-          // Gasto -> Resta balance. Ingreso -> Suma balance. (Se descuenta una sola vez el monto total del padre)
-          const balanceOffset = txType === 'gasto' ? -Math.abs(parseFloat(g.monto)) : Math.abs(parseFloat(g.monto));
-          const newBalance = parseFloat(matchedAccount.balance) + balanceOffset;
-          await matchedAccount.update({ balance: newBalance }, { transaction: t });
+              const matchedCategory = activeCategories.find(
+                cat => cat.name.toLowerCase().trim() === g.categoria_sugerida.toLowerCase().trim()
+              );
 
-          // Crear las sub-transacciones asociadas (hijos) si aplica división
-          const childTransactionsInfo = [];
-          if (hasSplits) {
-            const childrenData = [];
-            for (const s of g.divisiones) {
-              childrenData.push({
+              const txDate = g.fecha ? new Date(g.fecha + 'T12:00:00') : new Date();
+              const txType = g.tipo === 'ingreso' ? 'ingreso' : 'gasto';
+              const hasSplits = g.divisiones && g.divisiones.length > 0;
+
+              if (hasSplits) {
+                const sumSplits = g.divisiones.reduce((sum, s) => sum + Math.abs(parseFloat(s.monto)), 0);
+                if (Math.abs(sumSplits - Math.abs(parseFloat(g.monto))) > 0.01) {
+                  throw new Error(`La suma de las partes divididas ($${sumSplits}) no coincide con el monto total ($${g.monto}).`);
+                }
+              }
+
+              const newTx = await Transaction.create({
                 account_id: matchedAccount.id,
-                amount: Math.abs(parseFloat(s.monto)),
+                amount: Math.abs(parseFloat(g.monto)),
                 date: txDate,
                 original_description: g.descripcion,
-                custom_description: s.descripcion,
-                category_id: newTx.category_id, // Hereda la categoría del padre
+                category_id: matchedCategory ? matchedCategory.id : null,
                 type: txType,
                 source: 'manual',
-                parent_id: newTx.id,
-                is_split: false,
+                is_split: hasSplits,
                 user_id: userId
-              });
+              }, { transaction: t });
 
-              childTransactionsInfo.push({
-                monto: s.monto,
+              const balanceOffset = txType === 'gasto' ? -Math.abs(parseFloat(g.monto)) : Math.abs(parseFloat(g.monto));
+              const newBalance = parseFloat(matchedAccount.balance) + balanceOffset;
+              await matchedAccount.update({ balance: newBalance }, { transaction: t });
+
+              const childTransactionsInfo = [];
+              if (hasSplits) {
+                const childrenData = [];
+                for (const s of g.divisiones) {
+                  childrenData.push({
+                    account_id: matchedAccount.id,
+                    amount: Math.abs(parseFloat(s.monto)),
+                    date: txDate,
+                    original_description: g.descripcion,
+                    custom_description: s.descripcion,
+                    category_id: newTx.category_id,
+                    type: txType,
+                    source: 'manual',
+                    parent_id: newTx.id,
+                    is_split: false,
+                    user_id: userId
+                  });
+                  childTransactionsInfo.push({
+                    monto: s.monto,
+                    categoria: matchedCategory ? matchedCategory.name : 'General',
+                    descripcion: s.descripcion
+                  });
+                }
+                await Transaction.bulkCreate(childrenData, { transaction: t });
+              }
+
+              registeredTransactions.push({
+                id: newTx.id,
+                monto: g.monto,
+                tipo: txType,
+                cuenta: matchedAccount.name,
                 categoria: matchedCategory ? matchedCategory.name : 'General',
-                descripcion: s.descripcion
+                descripcion: g.descripcion,
+                fecha: txDate.toISOString().split('T')[0],
+                is_split: hasSplits,
+                divisiones: childTransactionsInfo
               });
             }
-            await Transaction.bulkCreate(childrenData, { transaction: t });
-          }
 
-          registeredTransactions.push({
-            id: newTx.id,
-            monto: g.monto,
-            tipo: txType,
-            cuenta: matchedAccount.name,
-            categoria: matchedCategory ? matchedCategory.name : 'General',
-            descripcion: g.descripcion,
-            fecha: txDate.toISOString().split('T')[0],
-            is_split: hasSplits,
-            divisiones: childTransactionsInfo
-          });
+            results.push({
+              name: 'registrarTransacciones',
+              call,
+              response: { success: true, message: 'Movimientos financieros guardados en base de datos.', registeredTransactions }
+            });
+          }
+          else if (call.name === 'modificarTransaccion') {
+            const { transaccion_id, criterio_busqueda, modificaciones } = call.args;
+            let tx = null;
+            if (transaccion_id) {
+              tx = await Transaction.findOne({ where: { id: transaccion_id, user_id: userId }, transaction: t });
+            } else if (criterio_busqueda) {
+              if (criterio_busqueda.es_ultimo) {
+                tx = await Transaction.findOne({
+                  where: { user_id: userId },
+                  order: [['date', 'DESC'], ['id', 'DESC']],
+                  transaction: t
+                });
+              } else {
+                const whereClause = { user_id: userId };
+                if (criterio_busqueda.descripcion) {
+                  whereClause.original_description = { [Op.like]: `%${criterio_busqueda.descripcion}%` };
+                }
+                if (criterio_busqueda.monto) {
+                  whereClause.amount = Math.abs(parseFloat(criterio_busqueda.monto));
+                }
+                if (criterio_busqueda.fecha) {
+                  const startDate = new Date(criterio_busqueda.fecha + 'T00:00:00');
+                  const endDate = new Date(criterio_busqueda.fecha + 'T23:59:59');
+                  whereClause.date = { [Op.between]: [startDate, endDate] };
+                }
+                tx = await Transaction.findOne({
+                  where: whereClause,
+                  order: [['date', 'DESC'], ['id', 'DESC']],
+                  transaction: t
+                });
+              }
+            } else {
+              tx = await Transaction.findOne({
+                where: { user_id: userId },
+                order: [['date', 'DESC'], ['id', 'DESC']],
+                transaction: t
+              });
+            }
+
+            if (!tx) {
+              throw new Error('No se encontró ninguna transacción que coincida con los criterios indicados.');
+            }
+
+            const oldAccount = await Account.findByPk(tx.account_id, { transaction: t });
+            if (!oldAccount) {
+              throw new Error('La cuenta asociada a la transacción original no fue encontrada.');
+            }
+
+            let newAccount = oldAccount;
+            if (modificaciones.cuenta) {
+              const matchedAcc = activeAccounts.find(
+                acc => acc.name.toLowerCase().trim() === modificaciones.cuenta.toLowerCase().trim()
+              );
+              if (!matchedAcc) {
+                throw new Error(`La cuenta bancaria '${modificaciones.cuenta}' no fue encontrada.`);
+              }
+              if (matchedAcc.id !== oldAccount.id) {
+                newAccount = await Account.findByPk(matchedAcc.id, { transaction: t });
+              }
+            }
+
+            const oldBalanceOffset = tx.type === 'gasto' ? parseFloat(tx.amount) : -parseFloat(tx.amount);
+            oldAccount.balance = parseFloat(oldAccount.balance) + oldBalanceOffset;
+
+            const newAmount = modificaciones.monto !== undefined ? Math.abs(parseFloat(modificaciones.monto)) : parseFloat(tx.amount);
+            const newBalanceOffset = tx.type === 'gasto' ? -newAmount : newAmount;
+
+            if (oldAccount.id !== newAccount.id) {
+              await oldAccount.save({ transaction: t });
+              newAccount.balance = parseFloat(newAccount.balance) + newBalanceOffset;
+              await newAccount.save({ transaction: t });
+            } else {
+              oldAccount.balance = parseFloat(oldAccount.balance) + newBalanceOffset;
+              await oldAccount.save({ transaction: t });
+            }
+
+            if (modificaciones.categoria) {
+              const matchedCategory = activeCategories.find(
+                cat => cat.name.toLowerCase().trim() === modificaciones.categoria.toLowerCase().trim()
+              );
+              if (!matchedCategory) {
+                throw new Error(`La categoría '${modificaciones.categoria}' no existe en tus categorías.`);
+              }
+              tx.category_id = matchedCategory.id;
+            }
+
+            tx.original_description = modificaciones.descripcion || tx.original_description;
+            tx.amount = newAmount;
+            tx.account_id = newAccount.id;
+            if (modificaciones.fecha) {
+              tx.date = new Date(modificaciones.fecha + 'T12:00:00');
+            }
+
+            await tx.save({ transaction: t });
+
+            const modifiedTransaction = {
+              id: tx.id,
+              descripcion: tx.original_description,
+              monto: tx.amount,
+              cuenta: newAccount.name,
+              categoria: modificaciones.categoria || (await Category.findByPk(tx.category_id, { transaction: t }))?.name || 'General',
+              fecha: tx.date.toISOString().split('T')[0]
+            };
+
+            results.push({
+              name: 'modificarTransaccion',
+              call,
+              response: { success: true, message: 'Transacción modificada con éxito.', modifiedTransaction }
+            });
+          }
         }
 
         await t.commit();
@@ -386,38 +571,44 @@ REGLAS DE OPERACIÓN:
         if (!isCommitted) {
           await t.rollback();
         }
-        console.error('Error procesando el registro de transacciones en base de datos:', dbError);
-        return res.status(400).json({ 
-          error: 'Error al registrar las transacciones en base de datos', 
-          message: dbError.message 
+        console.error('Error ejecutando llamadas a herramientas de base de datos:', dbError);
+        return res.status(400).json({
+          error: 'Error al ejecutar las acciones en base de datos',
+          message: dbError.message
         });
       }
 
-      // Alertas de presupuesto/notificaciones (fuera de la transacción de DB)
+      // Notificaciones
       try {
         const { checkAndNotifySpending } = require('../services/notificationService');
         if (typeof checkAndNotifySpending === 'function') {
           checkAndNotifySpending(userId);
         }
       } catch (err) {
-        console.warn('Servicio de notificaciones de presupuesto no disponible:', err.message);
+        console.warn('Servicio de alertas no disponible:', err.message);
       }
 
-      // Enviar la respuesta de la función de vuelta a Gemini para obtener el resumen narrativo final
-      contents.push({
-        role: 'model',
-        parts: [{ functionCall: functionCall }]
-      });
-      
-      contents.push({
-        role: 'user',
-        parts: [{
-          functionResponse: {
-            name: 'registrarTransacciones',
-            response: { success: true, message: 'Movimientos financieros guardados en base de datos.', registeredTransactions }
-          }
-        }]
-      });
+      // Alimentar de vuelta a Gemini con las respuestas
+      for (const resItem of results) {
+        contents.push({
+          role: 'model',
+          parts: [{
+            functionCall: {
+              name: resItem.call.name,
+              args: resItem.call.args
+            }
+          }]
+        });
+        contents.push({
+          role: 'user',
+          parts: [{
+            functionResponse: {
+              name: resItem.name,
+              response: resItem.response
+            }
+          }]
+        });
+      }
 
       let finalResponseText = '';
       try {
@@ -426,210 +617,31 @@ REGLAS DE OPERACIÓN:
           contents: contents,
           config: {
             systemInstruction,
-            tools: [{ functionDeclarations: [registrarTransaccionesTool, modificarTransaccionTool] }]
+            tools: [{ functionDeclarations: [registrarTransaccionesTool, modificarTransaccionTool, crearCategoriaTool] }]
           }
         });
         finalResponseText = finalResponse.text;
       } catch (geminiError) {
-        console.error('Error al generar respuesta narrativa final en Gemini:', geminiError);
-        finalResponseText = `¡Listo! He registrado con éxito los siguientes movimientos:\n` +
-          registeredTransactions.map(e => {
-            let line = `- [${e.tipo.toUpperCase()}] ${e.descripcion}: $${new Intl.NumberFormat('es-CL').format(e.monto)} en tu cuenta ${e.cuenta} (${e.fecha})`;
-            if (e.is_split && e.divisiones && e.divisiones.length > 0) {
-              line += `\n  Desglose de divisiones:\n` +
-                e.divisiones.map(d => `    • ${d.descripcion}: $${new Intl.NumberFormat('es-CL').format(d.monto)} (Categoría: ${d.categoria})`).join('\n');
-            }
-            return line;
-          }).join('\n');
+        console.error('Error al generar respuesta narrativa final:', geminiError);
+        finalResponseText = `¡Listo! He ejecutado las siguientes acciones:\n` +
+          results.map(r => `- ${r.response.message}`).join('\n');
       }
 
-      const responseMsg = finalResponseText || 'He registrado tus movimientos exitosamente.';
+      const responseMsg = finalResponseText || 'Acción procesada con éxito.';
       await AiChatMessage.create({
         user_id: userId,
         sender: 'ai',
         text: responseMsg
       });
 
-      return res.json({
-        type: 'action_completed',
-        message: responseMsg,
-        expenses: registeredTransactions
-      });
-    }
-
-    // 7. Verificar si la IA decidió llamar a modificarTransaccion
-    if (functionCall && functionCall.name === 'modificarTransaccion') {
-      const { transaccion_id, criterio_busqueda, modificaciones } = functionCall.args;
-      const t = await sequelize.transaction();
-      let isCommitted = false;
-      let modifiedTransaction = null;
-
-      try {
-        // Buscar la transacción a modificar
-        let tx = null;
-        if (transaccion_id) {
-          tx = await Transaction.findOne({ where: { id: transaccion_id, user_id: userId }, transaction: t });
-        } else if (criterio_busqueda) {
-          if (criterio_busqueda.es_ultimo) {
-            tx = await Transaction.findOne({ 
-              where: { user_id: userId }, 
-              order: [['date', 'DESC'], ['id', 'DESC']],
-              transaction: t
-            });
-          } else {
-            const whereClause = { user_id: userId };
-            if (criterio_busqueda.descripcion) {
-              whereClause.original_description = { [Op.like]: `%${criterio_busqueda.descripcion}%` };
-            }
-            if (criterio_busqueda.monto) {
-              whereClause.amount = Math.abs(parseFloat(criterio_busqueda.monto));
-            }
-            if (criterio_busqueda.fecha) {
-              const startDate = new Date(criterio_busqueda.fecha + 'T00:00:00');
-              const endDate = new Date(criterio_busqueda.fecha + 'T23:59:59');
-              whereClause.date = { [Op.between]: [startDate, endDate] };
-            }
-            tx = await Transaction.findOne({ 
-              where: whereClause, 
-              order: [['date', 'DESC'], ['id', 'DESC']],
-              transaction: t
-            });
-          }
-        } else {
-          // Por defecto buscar el último movimiento
-          tx = await Transaction.findOne({ 
-            where: { user_id: userId }, 
-            order: [['date', 'DESC'], ['id', 'DESC']],
-            transaction: t
-          });
-        }
-
-        if (!tx) {
-          throw new Error('No se encontró ninguna transacción que coincida con los criterios indicados.');
-        }
-
-        const oldAccount = await Account.findByPk(tx.account_id, { transaction: t });
-        if (!oldAccount) {
-          throw new Error('La cuenta asociada a la transacción original no fue encontrada.');
-        }
-
-        let newAccount = oldAccount;
-        if (modificaciones.cuenta) {
-          const matchedAcc = accounts.find(
-            acc => acc.name.toLowerCase().trim() === modificaciones.cuenta.toLowerCase().trim()
-          );
-          if (!matchedAcc) {
-            throw new Error(`La cuenta bancaria '${modificaciones.cuenta}' no fue encontrada.`);
-          }
-          if (matchedAcc.id !== oldAccount.id) {
-            newAccount = await Account.findByPk(matchedAcc.id, { transaction: t });
-          }
-        }
-
-        // Reversar saldo en cuenta anterior
-        const oldBalanceOffset = tx.type === 'gasto' ? parseFloat(tx.amount) : -parseFloat(tx.amount);
-        oldAccount.balance = parseFloat(oldAccount.balance) + oldBalanceOffset;
-
-        // Obtener nuevos valores
-        const newAmount = modificaciones.monto !== undefined ? Math.abs(parseFloat(modificaciones.monto)) : parseFloat(tx.amount);
-        const newBalanceOffset = tx.type === 'gasto' ? -newAmount : newAmount;
-
-        // Aplicar nuevos saldos
-        if (oldAccount.id !== newAccount.id) {
-          await oldAccount.save({ transaction: t });
-          newAccount.balance = parseFloat(newAccount.balance) + newBalanceOffset;
-          await newAccount.save({ transaction: t });
-        } else {
-          oldAccount.balance = parseFloat(oldAccount.balance) + newBalanceOffset;
-          await oldAccount.save({ transaction: t });
-        }
-
-        // Aplicar cambios a la transacción
-        if (modificaciones.categoria) {
-          const matchedCategory = categories.find(
-            cat => cat.name.toLowerCase().trim() === modificaciones.categoria.toLowerCase().trim()
-          );
-          if (!matchedCategory) {
-            throw new Error(`La categoría '${modificaciones.categoria}' no existe en tus categorías.`);
-          }
-          tx.category_id = matchedCategory.id;
-        }
-
-        tx.original_description = modificaciones.descripcion || tx.original_description;
-        tx.amount = newAmount;
-        tx.account_id = newAccount.id;
-        if (modificaciones.fecha) {
-          tx.date = new Date(modificaciones.fecha + 'T12:00:00');
-        }
-
-        await tx.save({ transaction: t });
-
-        modifiedTransaction = {
-          id: tx.id,
-          descripcion: tx.original_description,
-          monto: tx.amount,
-          cuenta: newAccount.name,
-          categoria: modificaciones.categoria || (await Category.findByPk(tx.category_id, { transaction: t }))?.name || 'General',
-          fecha: tx.date.toISOString().split('T')[0]
-        };
-
-        await t.commit();
-        isCommitted = true;
-
-      } catch (dbError) {
-        if (!isCommitted) {
-          await t.rollback();
-        }
-        console.error('Error modificando la transacción en base de datos:', dbError);
-        return res.status(400).json({ 
-          error: 'Error al modificar la transacción en la base de datos', 
-          message: dbError.message 
-        });
-      }
-
-      // Enviar la respuesta de la función de vuelta a Gemini para obtener el resumen narrativo final
-      contents.push({
-        role: 'model',
-        parts: [{ functionCall: functionCall }]
-      });
-      
-      contents.push({
-        role: 'user',
-        parts: [{
-          functionResponse: {
-            name: 'modificarTransaccion',
-            response: { success: true, message: 'Transacción modificada con éxito en base de datos.', modifiedTransaction }
-          }
-        }]
-      });
-
-      let finalResponseText = '';
-      try {
-        const finalResponse = await ai.models.generateContent({
-          model: 'gemini-3.1-flash-lite',
-          contents: contents,
-          config: {
-            systemInstruction,
-            tools: [{ functionDeclarations: [registrarTransaccionesTool, modificarTransaccionTool] }]
-          }
-        });
-        finalResponseText = finalResponse.text;
-      } catch (geminiError) {
-        console.error('Error al generar respuesta de modificación en Gemini:', geminiError);
-        finalResponseText = `¡Modificado! He editado con éxito la transacción "${modifiedTransaction.descripcion}". El nuevo monto es $${new Intl.NumberFormat('es-CL').format(modifiedTransaction.monto)} en tu cuenta ${modifiedTransaction.cuenta} (Categoría: ${modifiedTransaction.categoria}).`;
-      }
-
-      const responseMsg = finalResponseText || 'Transacción modificada con éxito.';
-      await AiChatMessage.create({
-        user_id: userId,
-        sender: 'ai',
-        text: responseMsg
-      });
+      const registeredTxs = results.find(r => r.name === 'registrarTransacciones')?.response.registeredTransactions || [];
+      const modifiedTxs = results.find(r => r.name === 'modificarTransaccion')?.response.modifiedTransaction ? [results.find(r => r.name === 'modificarTransaccion').response.modifiedTransaction] : [];
+      const allExpenses = [...registeredTxs, ...modifiedTxs];
 
       return res.json({
         type: 'action_completed',
         message: responseMsg,
-        expenses: [modifiedTransaction]
+        expenses: allExpenses
       });
     }
 
@@ -648,9 +660,9 @@ REGLAS DE OPERACIÓN:
 
   } catch (error) {
     console.error('Error general en el Asistente de IA:', error);
-    res.status(500).json({ 
-      error: 'Error interno en el asistente de IA', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Error interno en el asistente de IA',
+      details: error.message
     });
   }
 };
