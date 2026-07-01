@@ -50,7 +50,7 @@ export default function Accounts() {
     }
   };
 
-  const totalBalance = accounts.reduce((acc, curr) => acc + (curr.balance || 0), 0);
+  const totalBalance = accounts.reduce((acc, curr) => acc + Number(curr.balance || 0), 0);
   const totalBalanceStr = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalBalance);
 
   return (
