@@ -146,7 +146,7 @@ const crearCategoriaTool = {
       },
       tipo_gasto: {
         type: 'STRING',
-        description: 'Opcional. Tipo de gasto: "fijo" (Necesario) o "libre" (Ocio). Si no está claro o el usuario no lo especificó en su mensaje anterior, NO lo definas aquí para poder preguntarle.'
+        description: 'Tipo de gasto: "fijo" (Necesario) o "libre" (Ocio).'
       },
       icono_sugerido: {
         type: 'STRING',
@@ -157,7 +157,7 @@ const crearCategoriaTool = {
         description: 'Color seleccionado de la lista disponible: "bg-red-200", "bg-orange-200", "bg-yellow-200", "bg-green-200", "bg-teal-200", "bg-blue-200", "bg-indigo-200", "bg-purple-200", "bg-pink-200", "bg-slate-200".'
       }
     },
-    required: ['nombre', 'icono_sugerido', 'color_sugerido']
+    required: ['nombre', 'tipo_gasto', 'icono_sugerido', 'color_sugerido']
   }
 };
 
@@ -253,11 +253,11 @@ REGLAS DE OPERACIÓN:
      7. En tu respuesta narrativa final al usuario, debes detallar amigablemente el desglose completo de la división indicando los montos y detalles correspondientes de cada parte.
 
 8. Creación de Categorías (¡NUEVO!):
-   - Si el usuario te pide explícitamente crear una categoría (ej: "crea la categoría Transporte", "crea una nueva categoría para regalos llamada Regalos") o si respondes a la pregunta aclaratoria proponiendo una categoría y el usuario te responde aceptando (ej: "Sí, crea la categoría Transporte y es Fijo"), debes llamar a la herramienta 'crearCategoria'.
-   - Elige el ícono ('icono_sugerido') más ad-hoc seleccionado de la lista de íconos disponibles descrita en la herramienta.
-   - Elige un color ('color_sugerido') apropiado de la lista descrita en la herramienta.
-   - Tipo de Gasto (Fijo vs Libre): Si el usuario no especificó si la categoría es un gasto "Fijo (Necesario)" o "Libre (Ocio)", déjalo como "libre" o "fijo" temporalmente y, en tu respuesta final de confirmación, DEBES preguntarle explícitamente al usuario si esta categoría corresponde a un gasto "Fijo (Necesario)" o "Libre (Ocio)". Si el usuario ya lo especificó en su mensaje, entonces pásalo en el parámetro 'tipo_gasto' y confirma que quedó configurada como tal.
-   - Si te piden "Edita el ultimo movimiento, crea la categoría 'Transporte' y asignasela", debes llamar a 'crearCategoria' para crearla y a 'modificarTransaccion' para asignársela a la transacción. Ambas herramientas se pueden llamar en el mismo turno.
+   - Si el usuario te pide crear una categoría, o si propones crear una nueva categoría para un movimiento, es obligatoria la definición de 'tipo_gasto' (Fijo o Libre).
+   - Si el usuario no especificó explícitamente en su mensaje si es de tipo "Fijo (Necesario)" o "Libre (Ocio)", NO llames a la herramienta 'crearCategoria'. En su lugar, detén la ejecución del tool y responde en texto plano preguntándole directamente cómo desea clasificarla. Ejemplo: "Puedo crear la categoría 'Gastos Digitales' para ti. ¿Corresponde a un gasto Fijo (Necesario) o Libre (Ocio)?"
+   - Una vez que el usuario te lo confirme en el siguiente turno de conversación (ej: "Es un gasto fijo" o "Es libre"), procede a llamar a la herramienta 'crearCategoria' enviando el parámetro 'tipo_gasto' correspondiente ("fijo" o "libre").
+   - Elige el ícono ('icono_sugerido') más ad-hoc seleccionado de la lista de íconos disponibles descrita en la herramienta y un color ('color_sugerido') apropiado.
+   - Si te piden "Edita el ultimo movimiento, crea la categoría 'Transporte' y asignasela", debes llamar a 'crearCategoria' para crearla y a 'modificarTransaccion' para asignársela a la transacción. Ambas herramientas se pueden llamar en el mismo turno si y solo si tienes claro tanto el tipo de gasto (Fijo/Libre) como la categoría.
 `;
 
     // 3. Estructurar el historial de contenidos para Gemini
@@ -589,26 +589,18 @@ REGLAS DE OPERACIÓN:
       }
 
       // Alimentar de vuelta a Gemini con las respuestas
-      for (const resItem of results) {
-        contents.push({
-          role: 'model',
-          parts: [{
-            functionCall: {
-              name: resItem.call.name,
-              args: resItem.call.args
-            }
-          }]
-        });
-        contents.push({
-          role: 'user',
-          parts: [{
-            functionResponse: {
-              name: resItem.name,
-              response: resItem.response
-            }
-          }]
-        });
-      }
+      contents.push(response.candidates[0].content);
+
+      contents.push({
+        role: 'user',
+        parts: results.map(resItem => ({
+          functionResponse: {
+            name: resItem.name,
+            response: resItem.response,
+            id: resItem.call.id
+          }
+        }))
+      });
 
       let finalResponseText = '';
       try {
