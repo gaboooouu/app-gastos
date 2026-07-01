@@ -302,9 +302,7 @@ REGLAS DE OPERACIÓN:
       parts: currentParts
     });
 
-    // 5. Llamar a la API de Gemini
-    // Usamos el modelo gemini-3.1-flash-lite ya que soporta audio nativo e instrucciones del sistema
-    const response = await ai.models.generateContent({
+    let response = await ai.models.generateContent({
       model: 'gemini-3.1-flash-lite',
       contents: contents,
       config: {
@@ -313,15 +311,28 @@ REGLAS DE OPERACIÓN:
       }
     });
 
-    const functionCalls = response.functionCalls || [];
+    let maxIterations = 5;
+    let iteration = 0;
+    let loopActive = true;
+    let finalResponseText = '';
+    let registeredTxs = [];
+    let modifiedTxs = [];
+    let resultsMessage = '';
 
-    if (functionCalls.length > 0) {
+    while (loopActive && iteration < maxIterations) {
+      iteration++;
+      const functionCalls = response.functionCalls || [];
+      if (functionCalls.length === 0) {
+        finalResponseText = response.text || '';
+        loopActive = false;
+        break;
+      }
+
       const t = await sequelize.transaction();
-      let isCommitted = false;
+      let isLocalCommitted = false;
       const results = [];
 
       try {
-        // Cargar categorías y cuentas en la transacción
         let activeCategories = await Category.findAll({ where: { user_id: userId }, transaction: t });
         let activeAccounts = await Account.findAll({ where: { user_id: userId }, transaction: t });
 
@@ -329,7 +340,6 @@ REGLAS DE OPERACIÓN:
           if (call.name === 'crearCategoria') {
             const { nombre, tipo_gasto, icono_sugerido, color_sugerido } = call.args;
 
-            // Evitar duplicados
             let existing = activeCategories.find(
               c => c.name.toLowerCase().trim() === nombre.toLowerCase().trim()
             );
@@ -363,7 +373,7 @@ REGLAS DE OPERACIÓN:
           }
           else if (call.name === 'registrarTransacciones') {
             const { transacciones } = call.args;
-            const registeredTransactions = [];
+            const txsThisCall = [];
 
             for (const g of transacciones) {
               let matchedAccount = activeAccounts.find(
@@ -433,7 +443,7 @@ REGLAS DE OPERACIÓN:
                 await Transaction.bulkCreate(childrenData, { transaction: t });
               }
 
-              registeredTransactions.push({
+              const txObj = {
                 id: newTx.id,
                 monto: g.monto,
                 tipo: txType,
@@ -443,13 +453,15 @@ REGLAS DE OPERACIÓN:
                 fecha: txDate.toISOString().split('T')[0],
                 is_split: hasSplits,
                 divisiones: childTransactionsInfo
-              });
+              };
+              txsThisCall.push(txObj);
+              registeredTxs.push(txObj);
             }
 
             results.push({
               name: 'registrarTransacciones',
               call,
-              response: { success: true, message: 'Movimientos financieros guardados en base de datos.', registeredTransactions }
+              response: { success: true, message: 'Movimientos financieros guardados en base de datos.', registeredTransactions: txsThisCall }
             });
           }
           else if (call.name === 'modificarTransaccion') {
@@ -459,8 +471,8 @@ REGLAS DE OPERACIÓN:
               tx = await Transaction.findOne({ where: { id: transaccion_id, user_id: userId }, transaction: t });
             } else if (criterio_busqueda) {
               if (criterio_busqueda.es_ultimo) {
-                tx = await Transaction.findOne({
-                  where: { user_id: userId },
+                tx = await Transaction.findOne({ 
+                  where: { user_id: userId }, 
                   order: [['date', 'DESC'], ['id', 'DESC']],
                   transaction: t
                 });
@@ -477,15 +489,15 @@ REGLAS DE OPERACIÓN:
                   const endDate = new Date(criterio_busqueda.fecha + 'T23:59:59');
                   whereClause.date = { [Op.between]: [startDate, endDate] };
                 }
-                tx = await Transaction.findOne({
-                  where: whereClause,
+                tx = await Transaction.findOne({ 
+                  where: whereClause, 
                   order: [['date', 'DESC'], ['id', 'DESC']],
                   transaction: t
                 });
               }
             } else {
-              tx = await Transaction.findOne({
-                where: { user_id: userId },
+              tx = await Transaction.findOne({ 
+                where: { user_id: userId }, 
                 order: [['date', 'DESC'], ['id', 'DESC']],
                 transaction: t
               });
@@ -555,6 +567,7 @@ REGLAS DE OPERACIÓN:
               categoria: modificaciones.categoria || (await Category.findByPk(tx.category_id, { transaction: t }))?.name || 'General',
               fecha: tx.date.toISOString().split('T')[0]
             };
+            modifiedTxs.push(modifiedTransaction);
 
             results.push({
               name: 'modificarTransaccion',
@@ -565,16 +578,16 @@ REGLAS DE OPERACIÓN:
         }
 
         await t.commit();
-        isCommitted = true;
+        isLocalCommitted = true;
 
       } catch (dbError) {
-        if (!isCommitted) {
+        if (!isLocalCommitted) {
           await t.rollback();
         }
         console.error('Error ejecutando llamadas a herramientas de base de datos:', dbError);
-        return res.status(400).json({
-          error: 'Error al ejecutar las acciones en base de datos',
-          message: dbError.message
+        return res.status(400).json({ 
+          error: 'Error al ejecutar las acciones en base de datos', 
+          message: dbError.message 
         });
       }
 
@@ -587,6 +600,8 @@ REGLAS DE OPERACIÓN:
       } catch (err) {
         console.warn('Servicio de alertas no disponible:', err.message);
       }
+
+      resultsMessage += (resultsMessage ? '\n' : '') + results.map(r => `- ${r.response.message}`).join('\n');
 
       // Alimentar de vuelta a Gemini con las respuestas
       contents.push(response.candidates[0].content);
@@ -602,9 +617,9 @@ REGLAS DE OPERACIÓN:
         }))
       });
 
-      let finalResponseText = '';
+      // Llamar de nuevo para ver si requiere otra iteración
       try {
-        const finalResponse = await ai.models.generateContent({
+        response = await ai.models.generateContent({
           model: 'gemini-3.1-flash-lite',
           contents: contents,
           config: {
@@ -612,22 +627,22 @@ REGLAS DE OPERACIÓN:
             tools: [{ functionDeclarations: [registrarTransaccionesTool, modificarTransaccionTool, crearCategoriaTool] }]
           }
         });
-        finalResponseText = finalResponse.text;
       } catch (geminiError) {
-        console.error('Error al generar respuesta narrativa final:', geminiError);
-        finalResponseText = `¡Listo! He ejecutado las siguientes acciones:\n` +
-          results.map(r => `- ${r.response.message}`).join('\n');
+        console.error('Error al generar contenido en el ciclo de herramientas:', geminiError);
+        finalResponseText = `¡Listo! He ejecutado las siguientes acciones:\n` + resultsMessage;
+        loopActive = false;
       }
+    }
 
-      const responseMsg = finalResponseText || 'Acción procesada con éxito.';
+    // 7. Evaluar el resultado del ciclo de ejecución
+    if (resultsMessage !== '') {
+      const responseMsg = finalResponseText || resultsMessage || 'Acción procesada con éxito.';
       await AiChatMessage.create({
         user_id: userId,
         sender: 'ai',
         text: responseMsg
       });
 
-      const registeredTxs = results.find(r => r.name === 'registrarTransacciones')?.response.registeredTransactions || [];
-      const modifiedTxs = results.find(r => r.name === 'modificarTransaccion')?.response.modifiedTransaction ? [results.find(r => r.name === 'modificarTransaccion').response.modifiedTransaction] : [];
       const allExpenses = [...registeredTxs, ...modifiedTxs];
 
       return res.json({
@@ -637,8 +652,8 @@ REGLAS DE OPERACIÓN:
       });
     }
 
-    // 8. Si la IA respondió con texto plano (preguntando o conversando)
-    const responseMsg = response.text || 'No logré entender completamente la instrucción. ¿Podrías repetirla o darme más detalles?';
+    // 8. Si la IA respondió con texto plano (preguntando o conversando sin ejecutar herramientas)
+    const responseMsg = finalResponseText || 'No logré entender completamente la instrucción. ¿Podrías repetirla o darme más detalles?';
     await AiChatMessage.create({
       user_id: userId,
       sender: 'ai',
